@@ -13,7 +13,7 @@ model:
 
 training:
     data_mode: 0
-    label_type: 1
+    label_type: 0
     num_val: 3
     num_epochs: 50
     num_batch: 32

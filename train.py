@@ -115,11 +115,11 @@ def leave_one_out_cross_validation(config):
               + f'sen: {np.mean(test_sen)*100:.2f},  spc: {np.mean(test_spc)*100:.2f}')
 
     # plot confusion matrix
-    if config.training.label_type == 2:
+    if config.training.label_type == 0:
         lab = ['WG','Resting']
-    elif config.training.label_type == 3:
+    elif config.training.label_type == 1:
         lab = ['DSR','Resting']
-    elif config.training.label_type == 4:
+    elif config.training.label_type == 2:
         lab = ['0-back','2-back','3-back']
     plot_confusion_matrix(cf_out, lab)
 
