@@ -1,22 +1,19 @@
-# SyncNet2 81.86
 model: 
-    num_segments: 4
+    num_segments: 5
     embed_dim: 256
-    num_heads: 4
+    num_heads: 2
     num_layers: 1
-    num_groups: 4
+    num_groups: 1
     actv_mode: elu
     pool_mode: mean
-    k_size: [13, 3]
-    hid_dim: [128, 32]
+    k_size: [13, 5]
+    hid_dim: [64, 128]
     num_classes: 1
 
+
 training:
-    data_mode: 0
-    label_type: 0
-    num_val: 3
     num_epochs: 50
     num_batch: 32
-    learning_rate: 1e-4
+    learning_rate: 5e-4
     optimizer: Adam
     exlr_on: False

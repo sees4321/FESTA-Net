@@ -15,19 +15,6 @@ def segment_data(data:torch.Tensor, num_seg = 12):
         segments.append(segment)
     return torch.stack(segments, dim=1)
 
-class PositionalEncoding(nn.Module): # sinusoidal positional encoding
-    def __init__(self, dim, max_len=5000):
-        super(PositionalEncoding, self).__init__()
-        pe = torch.zeros(max_len, dim) 
-        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)  
-        div_term = torch.exp(torch.arange(0, dim, 2).float() * (-torch.log(torch.tensor(10000.0)) / dim))
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        self.pe = pe.unsqueeze(0)
-    
-    def forward(self, x):
-        return x + self.pe[:, :x.size(1), :].to(x.device) 
-
 class TransformerClassifier(nn.Module):
     def __init__(self, input_dim, num_segments, num_heads, num_layers, num_classes):
         super(TransformerClassifier, self).__init__()
@@ -35,7 +22,6 @@ class TransformerClassifier(nn.Module):
                                                    batch_first=True, activation=F.gelu)
         self.transformer = nn.TransformerEncoder(encoder_layer, num_layers=num_layers)
         self.fc = nn.Sequential(
-            # nn.Dropout(0.3),
             nn.Linear(input_dim*num_segments, num_classes),
             nn.Sigmoid() if num_classes == 1 else nn.LogSoftmax(dim=1)
         )
@@ -117,7 +103,6 @@ class FESTA_Net(nn.Module):
 
         self.eeg_enc = EEG_Encoder(eeg_shape[0], round(eeg_shape[-1]/num_segments), k_size[0], hid_dim[0], hid_dim[1], embed_dim, actv, pool, num_groups)
         self.fnirs_enc = fNIRS_Encoder(fnirs_shape[0], ceil(fnirs_shape[-1]/num_segments), k_size[1], hid_dim[0], hid_dim[1], embed_dim, actv, num_groups)
-        self.pos_encoder = PositionalEncoding(embed_dim)
         self.multimodal_fusion = nn.Sequential(
             nn.Linear(embed_dim*2, embed_dim),
             nn.GroupNorm(num_groups, num_segments),
@@ -136,7 +121,6 @@ class FESTA_Net(nn.Module):
         # multimodal feature fusion
         fused_tokens = torch.cat([eeg, fnirs], dim=2) # (batch, total_tokens, embed_dim*2)
         fused_tokens = self.multimodal_fusion(fused_tokens) # (batch, total_tokens, embed_dim)
-        fused_tokens = self.pos_encoder(fused_tokens) # (batch, total_tokens, embed_dim)
-
+        
         # Transformer classifier
         return self.classifier(fused_tokens) # (batch, num_classes)

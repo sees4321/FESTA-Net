@@ -21,36 +21,6 @@ def ManualSeed(seed:int, deterministic=True):
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
 
-def plot_confusion_matrix(cf:np.ndarray, cls_names:list, name, fontscale=1.2, fontsize=14):
-    import matplotlib.pyplot as plt
-    import seaborn as sns
-
-    n_classes = len(cls_names)
-    if n_classes < 3:
-        cf = cf[::-1,::-1]
-    cf_percent = cf.astype('float') / cf.sum(axis=1)[:, np.newaxis]
-    labels = (np.asarray(["{0:d}\n({1:.2%})".format(value, P_value)
-                      for value, P_value in zip(cf.flatten(),
-                                                cf_percent.flatten())])
-          ).reshape(n_classes, n_classes)
-    
-    plt.figure(figsize=(n_classes * fontscale + 6, n_classes * fontscale + 4))
-    sns.set(font_scale=fontscale)
-    heatmap = sns.heatmap(cf, annot=labels, fmt='', cmap='Blues', cbar=True,
-                          annot_kws={"size": fontsize})
-
-    heatmap.set_xlabel('Predicted Label', fontsize=fontsize+4, labelpad=fontsize+4)
-    heatmap.set_ylabel('True Label', fontsize=fontsize+4, labelpad=fontsize+4)
-    heatmap.set_title('Confusion Matrix', fontsize=fontsize+6, pad=24)
-
-    heatmap.set_xticklabels(cls_names, fontsize=fontsize+2)
-    heatmap.set_yticklabels(cls_names, rotation=0, fontsize=fontsize+2)
-
-    plt.tight_layout()
-    plt.savefig(f'confusion_matrix_{name}.png', dpi=300)
-    plt.show()
-
-
 class EarlyStopping:
     r"""
     Args:

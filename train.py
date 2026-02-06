@@ -114,19 +114,10 @@ def leave_one_out_cross_validation(config):
         print(f'[{config.training.data_mode} {config.training.label_type}]  avg Acc: {np.mean(test_acc):.2f} %,  std: {np.std(test_acc):.2f},'
               + f'sen: {np.mean(test_sen)*100:.2f},  spc: {np.mean(test_spc)*100:.2f}')
 
-    # plot confusion matrix
-    if config.training.label_type == 0:
-        lab = ['WG','Resting']
-    elif config.training.label_type == 1:
-        lab = ['DSR','Resting']
-    elif config.training.label_type == 2:
-        lab = ['0-back','2-back','3-back']
-    plot_confusion_matrix(cf_out, lab)
-
-
 if __name__ == "__main__":
+    config = None
     for task in ['wg','dsr','nback']:
         with open(f"yamls/{task}_best.yaml", 'r') as f:
             config_yaml = yaml.load(f, Loader=yaml.FullLoader)
             config = Box(config_yaml)
-            leave_one_out_cross_validation(config)
+        leave_one_out_cross_validation(config)
